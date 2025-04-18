@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     fonts-wqy-microhei \
     python3-pip \
     python3-dev \
+    git \
     dos2unix  \
     && if [ ! -f /usr/bin/python ]; then ln -s /usr/bin/python3 /usr/bin/python; fi \
     && if [ ! -f /usr/bin/pip ]; then ln -s /usr/bin/pip3 /usr/bin/pip; fi \
