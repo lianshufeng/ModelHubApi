@@ -13,8 +13,8 @@ RUN apt-get update && apt-get install -y \
 
 
 
-COPY ModelHubApi /opt/base/
-WORKDIR /opt/base/
+COPY . /opt/ModelHubApi
+WORKDIR /opt/ModelHubApi
 RUN find ./ -type f -exec dos2unix {} \;
 
 
