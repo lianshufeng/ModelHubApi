@@ -19,7 +19,7 @@ RUN find ./ -type f -exec dos2unix {} \;
 
 
 # 安装依赖
-RUN bash install.cmd
+RUN bash install.cmd;
 
 # 安装依赖库
 RUN pip install autoawq>=0.2.8 flash-attn>=2.7.4.post1
