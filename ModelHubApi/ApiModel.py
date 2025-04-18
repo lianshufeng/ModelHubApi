@@ -6,12 +6,14 @@ from pydantic import BaseModel
 
 class Message(BaseModel):
     role: str
-    content: str
+    content: Any
+
 
 class Choice(BaseModel):
     index: int
     message: Message
     finish_reason: str = "stop"
+
 
 class Usage(BaseModel):
     prompt_tokens: int
@@ -19,8 +21,11 @@ class Usage(BaseModel):
     total_tokens: int
 
 
-
 class ChatRequest(BaseModel):
+    # 模型名
+    model: str = None
+
+    # 信息
     messages: Any = [
         {
             "role": "user",
@@ -33,8 +38,11 @@ class ChatRequest(BaseModel):
     # 是否流式输出
     stream: bool = False
 
+    # 停止符
+    stop: str = None
+
     # 最大生成 token 数
-    max_new_tokens: int = 128
+    max_new_tokens: int = 4 * 1024
 
     # 温度采样值：控制输出的随机性，越低越稳定，越高越发散
     temperature: float = 0.8
@@ -54,9 +62,9 @@ class ChatRequest(BaseModel):
 
 
 class ChatResponse(BaseModel):
-    id: str=None
+    id: str = None
     object: str = "chat.completion"
-    created: int=None
-    model: str=None
-    choices: List[Choice]=None
+    created: int = None
+    model: str | None = None
+    choices: List[Choice] = None
     usage: Optional[Usage] = None

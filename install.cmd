@@ -9,5 +9,5 @@ echo :  updatetransformers
 pip uninstall transformers -y
 pip install --upgrade git+https://github.com/huggingface/transformers accelerate
 
-echo :  install fastapi
+echo :  install requirements.txt
 pip install --upgrade -r requirements.txt

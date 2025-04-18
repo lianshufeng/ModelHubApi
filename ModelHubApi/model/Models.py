@@ -1,8 +1,9 @@
 # model_base.py
 
 from pydantic import BaseModel
+from transformers import TextIteratorStreamer
 
-from ModelHubApi.ApiModel import ChatRequest, ChatResponse
+from ModelHubApi.ApiModel import ChatRequest
 
 
 class BaseModelHandler(BaseModel):
@@ -11,6 +12,6 @@ class BaseModelHandler(BaseModel):
         """加载模型（子类实现）"""
         pass
 
-    def chat(self, chat_request: ChatRequest)->ChatResponse:
+    def chat(self, chat_request: ChatRequest)->TextIteratorStreamer:
         """处理 chat 请求（子类实现）"""
         pass
