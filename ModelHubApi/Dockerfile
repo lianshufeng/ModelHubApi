@@ -22,6 +22,5 @@ RUN find ./ -type f -exec dos2unix {} \;
 # 安装依赖
 RUN bash install.cmd;
 
-# 安装依赖库
-RUN pip install --no-deps autoawq
+# 安装依赖库，暂时不支持awq, 版本依赖问题
 RUN pip install flash-attn

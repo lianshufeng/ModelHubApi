@@ -1,34 +1,39 @@
 # 添加到模块搜索路径
-import sys
 import os
+import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from typing import Any
-
 from qwen_vl_utils import process_vision_info
-from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor, TextIteratorStreamer, AutoTokenizer
-
-from ModelHubApi import start_server, build_text_iterator_streamer, get_task_pool
+from transformers import (
+    Qwen2_5_VLForConditionalGeneration,
+    AutoProcessor,
+    AutoTokenizer,
+    TextIteratorStreamer,
+)
+from ModelHubApi import start_server, build_text_iterator_streamer, get_task_pool, is_awq_model
 from ModelHubApi.ApiModel import ChatRequest
 from ModelHubApi.TransformersUtil import build_stopping_criteriaList
 from ModelHubApi.config import load_config
 from ModelHubApi.config.Config import Config
 from ModelHubApi.model import BaseModelHandler
 
-# 载入配置
+import torch
+
+# 加载配置
 config: Config = load_config()
 
 
-# 清理chat_request
+# 清理 chat_request
 def clean_chat_request(chat_request: ChatRequest):
     other = chat_request.model_dump()
-    other.pop("messages")
-    other.pop("stream")
-    other.pop("model")
-    other.pop("stop")
+    other.pop("messages", None)
+    other.pop("stream", None)
+    other.pop("model", None)
+    other.pop("stop", None)
 
-    # 删除value为None 的成员
+    # 删除值为 None 的参数
     for key in list(other.keys()):
         if other[key] is None:
             other.pop(key)
@@ -41,27 +46,41 @@ class Qwen2_5VLModelHandler(BaseModelHandler):
     tokenizer: Any = None
 
     def load_model(self):
-        # default model
-        self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-            config.model,
-            torch_dtype="auto",
-            device_map="auto",
-            attn_implementation='flash_attention_2' if config.flash_attention else None,
-        )
+        model_path = config.model
 
-        # default processor
-        self.processor = AutoProcessor.from_pretrained(config.model)
+        # 是否是 AWQ 模型：目录中包含 quant_config.json
+        is_awq = is_awq_model(model_path)
 
-        # default tokenizer
-        self.tokenizer = AutoTokenizer.from_pretrained(config.model, trust_remote_code=True)
+        if is_awq:
+            print("[INFO] Detected AWQ model. Loading with AutoAWQForCausalLM...")
+            self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+                model_path,
+                torch_dtype=torch.float16,
+                device_map="auto",
+                attn_implementation='flash_attention_2' if config.flash_attention else None
+            )
+        else:
+            print("[INFO] Loading standard (non-AWQ) model...")
+            self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+                model_path,
+                torch_dtype="auto",
+                device_map="auto",
+                attn_implementation='flash_attention_2' if config.flash_attention else None,
+                trust_remote_code=True,
+            )
+            # 如果模型支持 tie_weights 且还没绑定
+            if hasattr(self.model, "tie_weights"):
+                self.model.tie_weights()
+
+        # 加载 tokenizer 和 processor
+        self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+        self.processor = AutoProcessor.from_pretrained(model_path, trust_remote_code=True)
 
     def chat(self, chat_request: ChatRequest) -> TextIteratorStreamer:
-        # 获取messages
         messages = chat_request.messages
 
-        # 处理停止符
         stopping_criteria = None
-        if chat_request.stop is not None and chat_request.stop != '':
+        if chat_request.stop:
             stopping_criteria = build_stopping_criteriaList([chat_request.stop], self.tokenizer)
 
         text = self.processor.apply_chat_template(
@@ -77,11 +96,8 @@ class Qwen2_5VLModelHandler(BaseModelHandler):
         )
         inputs = inputs.to(self.model.device)
 
-        # 过滤其他参数
         other = clean_chat_request(chat_request)
-
         streamer = build_text_iterator_streamer(self.tokenizer)
-
         gen_kwargs = {'streamer': streamer, 'stopping_criteria': stopping_criteria, **inputs, **other}
 
         get_task_pool().submit(self.model.generate, **gen_kwargs)
