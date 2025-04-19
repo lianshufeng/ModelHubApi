@@ -60,7 +60,7 @@ class Qwen2_5VLModelHandler(BaseModelHandler):
                 attn_implementation='flash_attention_2' if config.flash_attention else None
             )
         else:
-            print("[INFO] Loading standard (non-AWQ) model...")
+            print("[INFO] Loading standard model...")
             self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
                 model_path,
                 torch_dtype="auto",
