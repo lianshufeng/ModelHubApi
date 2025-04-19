@@ -8,7 +8,7 @@ services:
     container_name: qwen2_5vl
     restart: always
     environment:
-      - CUDA_VISIBLE_DEVICES=0,1 # 多卡 0,1
+      - CUDA_VISIBLE_DEVICES=0 # 多卡 0,1
     deploy:
       resources:
         reservations:
@@ -17,6 +17,6 @@ services:
               count: "all"
               capabilities: [gpu]
     volumes:
-        - E:/git/huggingface/Qwen/Qwen2.5-VL-3B-InstructB:/models
+        - E:/git/huggingface/Qwen/Qwen2.5-VL-3B-Instruct:/models
     command: python Qwen2_5VLMain.py --model=/models
-#    command: sleep 1000
+    # command: sleep 1000

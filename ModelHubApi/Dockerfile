@@ -14,8 +14,8 @@ RUN apt-get update && apt-get install -y \
 
 
 
-COPY . /opt/ModelHubApi
-WORKDIR /opt/ModelHubApi
+COPY . /opt/ModelHubApi/ModelHubApi
+WORKDIR /opt/ModelHubApi/ModelHubApi
 RUN find ./ -type f -exec dos2unix {} \;
 
 
@@ -23,4 +23,5 @@ RUN find ./ -type f -exec dos2unix {} \;
 RUN bash install.cmd;
 
 # 安装依赖库
-RUN pip install autoawq flash-attn
+RUN pip install --no-deps autoawq
+RUN pip install flash-attn

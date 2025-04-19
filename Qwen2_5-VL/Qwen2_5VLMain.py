@@ -1,4 +1,9 @@
-from threading import Thread
+# 添加到模块搜索路径
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from typing import Any
 
 from qwen_vl_utils import process_vision_info
