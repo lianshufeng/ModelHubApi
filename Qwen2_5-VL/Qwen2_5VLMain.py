@@ -46,7 +46,7 @@ class Qwen2_5VLModelHandler(BaseModelHandler):
             config.model,
             torch_dtype="auto",
             device_map="auto",
-            attn_implementation='flash_attention_2' if config.is_flash_attention else None,
+            attn_implementation='flash_attention_2' if config.flash_attention else None,
         )
 
         # default processor

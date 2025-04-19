@@ -9,7 +9,7 @@ class Config(BaseModel):
     model: str = None  # 模型路径，不能为空，如: meta-llama/Llama-2-7b-hf
     max_task_count: int = 1  # 最大并发数，默认是 1
     max_time_out: float = 60.0  # 最大超时时间，单位秒
-    is_flash_attention: bool = False  # 默认使用 Flash Attention
+    flash_attention: bool = False  # 默认使用 Flash Attention
 
 
 # 定义并解析命令行参数。
@@ -23,7 +23,7 @@ def _parse_args():
     parser.add_argument("--max_task_count", type=int, default=1, help="最大的并发数，默认是 1")
     parser.add_argument("--max_time_out", type=float, default=60.0, help="最大的并发数，默认是 1")
 
-    parser.add_argument("--is_flash_attention", type=bool, default=False, help="是否使用 Flash Attention")
+    parser.add_argument("--flash_attention", type=bool, default=False, help="是否使用 Flash Attention")
 
     return parser.parse_args()
 
