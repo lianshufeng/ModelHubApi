@@ -1,0 +1,21 @@
+services:
+  qwen2_5-vl:
+    image: lianshufeng/model_api:qwen2audio
+#    shm_size: 6.15g
+    ports:
+      - "8080:8080"
+    privileged: true
+    container_name: qwen2-audio
+    restart: always
+    environment:
+      - CUDA_VISIBLE_DEVICES=0 # 多卡 0,1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: "all"
+              capabilities: [gpu]
+    volumes:
+        - E:/git/huggingface/Qwen/Qwen2-Audio-7B-Instruct:/models
+    command: python Qwen2AudioMain.py --model=/models --flash_attention=true
