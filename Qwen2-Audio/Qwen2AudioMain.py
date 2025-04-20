@@ -59,6 +59,17 @@ def clean_chat_request(chat_request: ChatRequest):
     return other
 
 
+def get_audio_data(ele) -> str | None:
+    audio = ele.get('audio') or ele.get('audio_url') or ele.get('input_audio')
+    if audio is None:
+        return None
+    if isinstance(audio, str):
+        return audio
+    elif hasattr(audio, 'data'):
+        return audio.get('data')
+    return None
+
+
 class Qwen2_AudioModelHandler(BaseModelHandler):
     model: Any = None
     processor: Any = None
@@ -89,10 +100,12 @@ class Qwen2_AudioModelHandler(BaseModelHandler):
         for message in messages:
             if isinstance(message["content"], list):
                 for ele in message["content"]:
-                    if ele["type"] == "audio":
-                        audios.append(
-                            load_audio_input(ele['audio_url'])
-                        )
+                    if ele["type"] in ("audio", "audio_url"):
+                        audio = get_audio_data(ele)
+                        if audio is not None:
+                            audios.append(
+                                load_audio_input(audio)
+                            )
 
         stopping_criteria = None
         if chat_request.stop:

@@ -8,7 +8,7 @@ services:
     container_name: qwen2-audio
     restart: always
     environment:
-      - CUDA_VISIBLE_DEVICES=0 # 多卡 0,1
+      - CUDA_VISIBLE_DEVICES=1 # 多卡 0,1
     deploy:
       resources:
         reservations:
@@ -18,4 +18,4 @@ services:
               capabilities: [gpu]
     volumes:
         - E:/git/huggingface/Qwen/Qwen2-Audio-7B-Instruct:/models
-    command: python Qwen2AudioMain.py --model=/models --flash_attention=true
+    command: python Qwen2AudioMain.py --model=/models
