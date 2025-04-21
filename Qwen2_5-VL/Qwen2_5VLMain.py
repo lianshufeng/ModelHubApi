@@ -53,24 +53,21 @@ class Qwen2_5VLModelHandler(BaseModelHandler):
 
         if is_awq:
             print("[INFO] Detected AWQ model. Loading with AutoAWQForCausalLM...")
-            self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-                model_path,
-                torch_dtype=torch.float16,
-                device_map="auto",
-                attn_implementation='flash_attention_2' if config.flash_attention else None
-            )
+            torch_dtype = torch.float16
         else:
             print("[INFO] Loading standard model...")
-            self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
-                model_path,
-                torch_dtype="auto",
-                device_map="auto",
-                attn_implementation='flash_attention_2' if config.flash_attention else None,
-                trust_remote_code=True,
-            )
-            # 如果模型支持 tie_weights 且还没绑定
-            if hasattr(self.model, "tie_weights"):
-                self.model.tie_weights()
+            torch_dtype = "auto"
+
+        self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+            model_path,
+            torch_dtype=torch_dtype,
+            device_map=config.device,
+            attn_implementation='flash_attention_2' if config.flash_attention else None,
+            trust_remote_code=True,
+        )
+        # 如果模型支持 tie_weights 且还没绑定
+        if hasattr(self.model, "tie_weights"):
+            self.model.tie_weights()
 
         # 加载 tokenizer 和 processor
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)

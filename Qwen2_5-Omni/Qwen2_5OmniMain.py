@@ -45,8 +45,10 @@ class Qwen2_5OmniHandler(BaseModelHandler):
     def load_model(self):
         model_path = config.model
 
-        self.model = Qwen2_5OmniForConditionalGeneration.from_pretrained(model_path, torch_dtype="auto",
-                                                                         device_map="auto")
+        self.model = Qwen2_5OmniForConditionalGeneration.from_pretrained(model_path,
+                                                                         torch_dtype="auto",
+                                                                         device_map=config.device,
+                                                                         )
         self.processor = Qwen2_5OmniProcessor.from_pretrained(model_path, trust_remote_code=True)
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
 

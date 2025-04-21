@@ -8,8 +8,9 @@ class Config(BaseModel):
     host: str = "0.0.0.0"  # 服务监听的 IP，默认是 0.0.0.0
     model: str = None  # 模型路径，不能为空，如: meta-llama/Llama-2-7b-hf
     max_task_count: int = 1  # 最大并发数，默认是 1
-    max_time_out: float = 60.0  # 最大超时时间，单位秒
+    max_time_out: float = 180.0  # 最大超时时间，单位秒
     flash_attention: bool = False  # 默认使用 Flash Attention
+    device: str = "auto"  # 推理设备
 
 
 # 定义并解析命令行参数。
@@ -21,7 +22,9 @@ def _parse_args():
     parser.add_argument("--model", type=str, help="模型路径不能为空，如: meta-llama/Llama-2-7b-hf",
                         required=True)
     parser.add_argument("--max_task_count", type=int, default=1, help="最大的并发数，默认是 1")
-    parser.add_argument("--max_time_out", type=float, default=60.0, help="最大的并发数，默认是 1")
+    parser.add_argument("--max_time_out", type=float, default=180.0, help="推理的超时时间，单位秒，默认是 60.0")
+
+    parser.add_argument("--device", type=str, default="auto", help="推理设备,auto/cpu/cuda")
 
     parser.add_argument("--flash_attention", type=bool, default=False, help="是否使用 Flash Attention")
 

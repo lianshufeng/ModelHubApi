@@ -1,4 +1,5 @@
 # 添加到模块搜索路径
+import base64
 import os
 import re
 import sys
@@ -81,7 +82,7 @@ class Qwen2_AudioModelHandler(BaseModelHandler):
         self.model = Qwen2AudioForConditionalGeneration.from_pretrained(
             model_path,
             torch_dtype="auto",
-            device_map="auto",
+            device_map=config.device,
             attn_implementation='flash_attention_2' if config.flash_attention else None,
             trust_remote_code=True,
         )
@@ -114,6 +115,15 @@ class Qwen2_AudioModelHandler(BaseModelHandler):
         text = self.processor.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True
         )
+
+        # 确保为数组
+        if isinstance(text, list) is False:
+            text = [text]
+
+        # 如果没有音频，则设置为 None
+        if len(audios) == 0:
+            audios = None
+
         inputs = self.processor(text=text, audio=audios, sampling_rate=16000, return_tensors="pt", padding=True)
         inputs.input_ids = inputs.to(self.model.device)
 
