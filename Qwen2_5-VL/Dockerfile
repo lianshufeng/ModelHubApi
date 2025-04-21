@@ -11,3 +11,5 @@ RUN find ./ -type f -exec dos2unix {} \;
 
 # 安装依赖
 RUN bash install.cmd;
+
+RUN pip install autoawq==0.1.8
