@@ -61,12 +61,12 @@ def clean_chat_request(chat_request: ChatRequest):
 
 
 def get_audio_data(ele) -> str | None:
-    audio = ele.get('audio') or ele.get('audio_url') or ele.get('input_audio')
+    audio: dict = ele.get('audio') or ele.get('audio_url') or ele.get('input_audio')
     if audio is None:
         return None
     if isinstance(audio, str):
         return audio
-    elif hasattr(audio, 'data'):
+    elif audio.get('data') is not None:
         return audio.get('data')
     return None
 
