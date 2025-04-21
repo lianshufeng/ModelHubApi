@@ -7,8 +7,8 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 
 echo :  update transformers
 pip uninstall transformers -y
-echo pip install --upgrade git+https://github.com/huggingface/transformers accelerate
-pip install --upgrade transformers accelerate
+echo pip install --upgrade transformers accelerate
+pip install --upgrade git+https://github.com/huggingface/transformers accelerate
 
 
 echo :  install requirements.txt
