@@ -54,6 +54,10 @@ class ChatRequest(BaseModel):
     top_k: int = 50
 
 
+    class Config:
+        extra = "allow"  # 允许接收额外字段
+
+
 # class ChatResponse(BaseModel):
 #     class Choice(BaseModel):
 #         text: str
