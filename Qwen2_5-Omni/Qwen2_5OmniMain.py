@@ -57,6 +57,9 @@ class Qwen2_5OmniHandler(BaseModelHandler):
                                                                          device_map=config.device,
                                                                          attn_implementation='flash_attention_2' if config.flash_attention else None,
                                                                          )
+        # 暂时禁用 talker (语音输出)
+        self.model.disable_talker()
+
         self.processor = Qwen2_5OmniProcessor.from_pretrained(model_path, trust_remote_code=True)
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
 
