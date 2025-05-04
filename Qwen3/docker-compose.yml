@@ -1,0 +1,21 @@
+services:
+  qwen2_5-vl:
+    image: lianshufeng/model_api:qwen3
+#    shm_size: 6.15g
+    ports:
+      - "8080:8080"
+    privileged: true
+    container_name: qwen3
+    restart: always
+    environment:
+      - CUDA_VISIBLE_DEVICES=0 # 多卡 0,1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: "all"
+              capabilities: [gpu]
+    volumes:
+        - E:/git/huggingface/Qwen/Qwen3-4B:/models
+    command: python Qwen3Main.py --model=/models --flash_attention=true
